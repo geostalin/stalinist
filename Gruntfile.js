@@ -7,6 +7,13 @@ module.exports = function(grunt) {
 			}).replace(/\n/gm,'')+"']";
 			var out = parent.replace(/\$\$fObj\$\$/,replacedChild);
 			grunt.file.write('./src/temp.js',out);
+			parent =  grunt.file.read('./src/iWorker.js');
+			child = grunt.file.read('./src/iFrameWorker.js');
+			replacedChild = "'"+child.replace(/\$\$(.+?)\$\$/,function(a,b){
+				return "'+"+b+"+'";
+			}).replace(/\n/gm,'')+"'";
+			out = parent.replace(/\$\$fObj\$\$/,replacedChild);
+			grunt.file.write('./src/itemp.js',out);
 	};
 	// Project configuration.
 	grunt.initConfig({
@@ -31,7 +38,7 @@ module.exports = function(grunt) {
 					seperator:";\n",
 					footer : 'communist.version = "<%= pkg.version %>";\n})(this);}'
 				},
-				files: {'dist/<%= pkg.name %>.js':['src/IE.js','src/setImmediate.js','src/promiscuous.js','src/utils.js','src/fakeWorker.js','src/temp.js','src/queue.js','src/wrapup.js']}
+				files: {'dist/<%= pkg.name %>.js':['src/IE.js','src/setImmediate.js','src/promiscuous.js','src/utils.js','src/fakeWorker.js','src/temp.js','src/itemp.js','src/queue.js','src/wrapup.js']}
 			}
 		},
 		mocha_phantomjs: {

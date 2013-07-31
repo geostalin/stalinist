@@ -92,6 +92,7 @@ communist.Queue = function CommunistQueue(obj, n, dumb) {
 	function keyFuncBatchTransfer(k) {
 		return function (array) {
 			return communist.all(array.map(function (data) {
+				console.log(data);
 				return doStuff(k, data[0], data[1]);
 			}));
 		};

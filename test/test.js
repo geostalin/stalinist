@@ -71,7 +71,7 @@ describe('cw()', function () {
 			comrade.data(buf,[buf]).then(function(a){assert.equal(a.byteLength,8)}).then(wrapUp,wrapUp);
 		});
 		
-	});undefined
+	});
 	describe('errors', function () {
 		it('should gracefully handle an error in a sticksaround', function (done) {
 			function wrapUp(){
@@ -172,20 +172,27 @@ describe('cw()', function () {
 		});
 	});
 	describe('Objects', function () {
-		var comrade = cw({product:product,aSquare:aSquare,square:square});
+		var comrade;
 		it("should be able create an object worker",function (done){
+			comrade = cw({product:product,aSquare:aSquare,square:square});
+			console.log(1);
 			comrade.aSquare(3).then(function(a){
+				console.log(2,' ',a);
 				assert.equal(a,9);
-			}).then(function(){
+			},function(a){console.log(a);}).then(function(){
+				console.log(3);
 				return comrade.product([20,100]);
-			}).then(function(a){assert.equal(a,2000)}).then(function(){
+			}).then(function(a){console.log(4,' ',a);assert.equal(a,2000)}).then(function(){
+				console.log(5);
 				return comrade.square(5);
-			}).then(function(a){assert.equal(a,25)}).then(done,done);
+			}).then(function(a){console.log(6,' ',a);assert.equal(a,25)}).then(done,done);
 		});
 		it("and catch an error in it",function (done){
+		
 			comrade.square("explode").then(function(){},function(a){assert.include(a,"explode");}).then(done,done);
 		});
 		it("and then do more stuff",function (done){
+			
 			comrade.square("explode").then(function(){},function(a){assert.include(a,"explode");
 			comrade.square(9).then(function(a){assert.equal(a,81)}).then(done,done);
 			});
@@ -202,8 +209,9 @@ describe('cw()', function () {
 		});
 	});
 	describe('Queues', function () {
-		var comrade = cw({product:product,aSquare:aSquare,square:square},2);
+
 		it("should be able create an object worker",function (done){
+			comrade = cw({product:product,aSquare:aSquare,square:square},2);
 			comrade.aSquare(3).then(function(a){
 				assert.equal(a,9);
 			}).then(function(){
@@ -213,7 +221,7 @@ describe('cw()', function () {
 			}).then(function(a){assert.equal(a,25)}).then(function(){done()},function(){done()});
 		});
 		it("and catch an error in it",function (done){
-			comrade.square("explode").then(function(){},function(a){assert.include(a,"explode");;}).then(done,done);
+			comrade.square("explode").then(function(){},function(a){assert.include(a,"explode");}).then(done,done);
 		});
 		it("and then do more stuff",function (done){
 			comrade.square("explode").then(function(){},function(a){assert.include(a,"explode");
@@ -224,6 +232,7 @@ describe('cw()', function () {
 			var i = 4;
 			var tot = 0;
 		comrade.batch(function(a){
+			console.log(a);
 				i--;
 				tot+=a;
 				if(!i){
@@ -277,10 +286,11 @@ describe('cw()', function () {
 			worker.batch('no');
 		});
 		it("cancel it not batch",function (done){
-			var worker = cw({waitForever:function(num,cb){setTimeout(function(){cb(num)},200)}},2);
+			var worker = cw({waitForever:function(num,cb){setTimeout(function(){cb(num)},20)}},2);
 			var yes = 0;
 			var no = 0;
 			var next = function(yes,no){
+				//console.log(yes,'|',no);
 				if((yes+no)===8){
 						assert(no>1);
 						worker.close().then(function(){done()},function(){done()});
@@ -289,10 +299,12 @@ describe('cw()', function () {
 			var ar = [1,2,3,4,5,6,7,8];
 			ar.forEach(function(a){
 				worker.waitForever(a).then(function(v){
+					console.log('yes ',a);
 					yes++;
 					worker.batch('no');
 					next(yes,no);
 				},function(v){
+					console.log('no ',a);
 					no++;
 					next(yes,no);
 				});
@@ -310,8 +322,8 @@ describe('cw()', function () {
 		});
 	});
 	describe('dumb Queues', function () {
-		var comrade = communist({product:product,aSquare:aSquare,square:square},2,"dumb");
 		it("should be able create an object worker",function (done){
+			comrade = communist({product:product,aSquare:aSquare,square:square},2,"dumb");
 			comrade.aSquare(3).then(function(a){
 				assert.equal(a,9);
 			}).then(function(){
